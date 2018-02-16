@@ -1,0 +1,46 @@
+
+apply plugin: 'war'
+apply plugin: 'eclipse'
+
+
+    repositories {
+    	mavenLocal()
+		 mavenCentral()
+	}
+
+
+
+version = '1.0.0'
+group = 'org.pulseus.auth'
+war.archiveName 'PULSEAuthPortlet.war'
+
+
+configurations {
+	// Exclude commons-logging
+	all*.exclude group: "commons-logging", module: "commons-logging"
+	all*.exclude group: "org.slf4j", module: "slf4j-simple"
+	compile.exclude group:'ch.qos.logback'
+	all*.exclude group: "org.slf4j", module: "slf4j-simple"
+	all*.exclude group: "org.slf4j", module: "log4j-over-slf4j"
+}
+
+dependencies {
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "2.0.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.util.taglib", version: "2.0.0"
+	compileOnly group: "javax.portlet", name: "portlet-api", version: "2.0"
+	compileOnly group: "javax.servlet", name: "javax.servlet-api", version: "3.0.1"
+	compileOnly group: "jstl", name: "jstl", version: "1.2"
+	compileOnly group: "org.osgi", name: "org.osgi.compendium", version: "5.0.0"
+	compile group: "org.springframework", name:"spring-webmvc-portlet", version: "4.3.9.RELEASE"
+	compile group: 'org.springframework.security', name: 'spring-security-core', version: '4.2.3.RELEASE'
+	compile group: 'org.springframework.security', name: 'spring-security-taglibs', version: '4.2.3.RELEASE'
+	compile group: 'org.springframework.security', name: 'spring-security-web', version: '4.2.3.RELEASE'
+	compile group: 'org.springframework.security', name: 'spring-security-config', version: '4.2.3.RELEASE'
+	compile group: 'org.springframework.security', name: 'spring-security-acl', version: '4.2.3.RELEASE'
+	compile group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.2.0.RELEASE'
+	compile group: "com.fasterxml.jackson.core", name:"jackson-databind", version:"2.8.5"
+	compile group: "com.fasterxml.jackson.core", name:"jackson-annotations", version:"2.8.5"
+	compile group: "com.fasterxml.jackson.core", name:"jackson-core", version:"2.8.5"
+	compile group: 'log4j', name: 'log4j', version: '1.2.17'
+	compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.0'
+}

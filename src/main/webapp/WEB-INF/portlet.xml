@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+
+<portlet-app xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd"
+	version="2.0">
+	<portlet>
+		<portlet-name>PULSEAuth</portlet-name>
+		<display-name>PULSE Auth Portlet</display-name>
+		<portlet-class>org.springframework.web.portlet.DispatcherPortlet</portlet-class>
+		
+		<init-param>
+            <name>contextClass</name>
+            <value>org.pulseus.auth.portlet.config.AnnotationConfigurationPortletContext
+            </value>
+        </init-param>
+        <init-param>
+            <name>contextConfigLocation</name>
+            <value>org.pulseus.auth.portlet.config.ViewConfig</value>
+        </init-param>
+        <init-param>
+            <name>config-template</name>
+            <value>/jsp/configuration.jsp</value>
+        </init-param>
+		
+		<supports>
+			<mime-type>text/html</mime-type>
+			<portlet-mode>view</portlet-mode>
+		</supports>
+		
+		<resource-bundle>content.Language</resource-bundle>
+		
+		<portlet-info>
+			<title>PULSE Auth Portlet</title>
+			<short-title>PULSE Auth Portlet</short-title>
+            <keywords>Liferay OAuth Portlet</keywords>
+		</portlet-info>
+		
+	</portlet>
+	<filter>
+			<filter-name>PortletSecurityFilter</filter-name>
+			<filter-class>org.pulseus.auth.portlet.security.filter.PortletSecurityFilter</filter-class>
+			<lifecycle>ACTION_PHASE</lifecycle>
+			<lifecycle>EVENT_PHASE</lifecycle>
+			<lifecycle>RENDER_PHASE</lifecycle>
+			<lifecycle>RESOURCE_PHASE</lifecycle>
+			<init-param>
+				<name>message</name>
+				<value>Security Filter</value>
+			</init-param>
+		</filter>
+ 
+		<filter-mapping>
+			<filter-name>PortletSecurityFilter</filter-name>
+			<portlet-name>PULSEAuth</portlet-name>
+		</filter-mapping>
+	
+</portlet-app>
