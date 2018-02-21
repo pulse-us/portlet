@@ -8,28 +8,29 @@ public class GrantedPermissionModel implements GrantedAuthority {
 	
 	private String authority;
 	
-	private Boolean value;
+	private Boolean boolGrantedValue;
 
-	public GrantedPermissionModel(String authority, Boolean value) {
+	public GrantedPermissionModel(String authority, Boolean boolGrantedValue) {
 		super();
 		this.authority = authority;
-		this.value = value;
+		this.boolGrantedValue = boolGrantedValue;
 	}
-
+	
+	@Override
 	public String getAuthority() {
 		return authority;
 	}
-
+	
 	public void setAuthority(String authority) {
 		this.authority = authority;
 	}
 
-	public Boolean getValue() {
-		return value;
+	public Boolean getBoolGrantedValue() {
+		return boolGrantedValue;
 	}
 
-	public void setValue(Boolean value) {
-		this.value = value;
+	public void setBoolGrantedValue(Boolean value) {
+		this.boolGrantedValue = value;
 	}
 	
 }
