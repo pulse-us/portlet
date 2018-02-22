@@ -5,6 +5,7 @@ import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Role;
 
 import io.jsonwebtoken.Jwts;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,6 +16,10 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import io.jsonwebtoken.SignatureAlgorithm;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.pulseus.auth.portlet.security.filter.PortletSecurityFilter;
 import org.springframework.security.crypto.codec.Base64;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,6 +34,8 @@ import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 public class JWTController {
 	
 	Configuration configuration = ConfigurationFactoryUtil.getConfiguration(PortalClassLoaderUtil.getClassLoader(), "portlet");
+	
+	private static final Logger log = LogManager.getLogger(JWTController.class);
 	
     @RequestMapping(value = "/auth/jwt", method = RequestMethod.GET, produces = "application/json")
     public String getJwt(HttpServletRequest request) throws PortalException {
@@ -49,10 +56,10 @@ public class JWTController {
 			jwtAuthorities.add(role.getName());
 		}
 		
-		List<String> orgs = new ArrayList<String>();
+		Map<String, Long> orgs = new HashMap<String, Long>();
 		if(!userLoggedIn.getOrganizations().isEmpty()){
 			for(Organization org : userLoggedIn.getOrganizations()){
-				orgs.add(org.getName());
+				orgs.put(org.getName(), org.getOrganizationId());
 			}
 		}
 		

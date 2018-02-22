@@ -6,7 +6,8 @@ import java.util.Set;
 public class GrantedOrganizationModel {
 
 	private String organizationName;
-	private long groupId;
+	private long orgId;
+	
 	private Set<GrantedPermissionModel> permissions = new HashSet<GrantedPermissionModel>();
 	public String getOrganizationName() {
 		return organizationName;
@@ -14,18 +15,17 @@ public class GrantedOrganizationModel {
 	public void setOrganizationName(String organizationName) {
 		this.organizationName = organizationName;
 	}
-	public long getGroupId() {
-		return groupId;
-	}
-	public void setGroupId(long groupId) {
-		this.groupId = groupId;
-	}
 	public Set<GrantedPermissionModel> getPermissions() {
 		return permissions;
 	}
 	public void setPermissions(Set<GrantedPermissionModel> permissions) {
 		this.permissions = permissions;
 	}
-	
+	public long getOrgId() {
+		return orgId;
+	}
+	public void setOrgId(long orgId) {
+		this.orgId = orgId;
+	}
 	
 }

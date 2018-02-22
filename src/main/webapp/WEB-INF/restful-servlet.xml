@@ -19,7 +19,7 @@
 	<mvc:annotation-driven/>
 
     <context:annotation-config />
-    <context:component-scan base-package="org.pulseus.auth.oauthPortlet" />
+    <context:component-scan base-package="org.pulseus.auth" />
     
      
 </beans>

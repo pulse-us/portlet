@@ -84,7 +84,6 @@ public class PortletSecurityFilter implements PortletFilter, ActionFilter, Rende
             PortletException {
     	log.info("-------------------------- doFilter");
         User user = null;
-        List<Role> roles = null;
         List<Organization> organizations = null;
         
         UserModel usermodel = new UserModel();
@@ -102,7 +101,7 @@ public class PortletSecurityFilter implements PortletFilter, ActionFilter, Rende
                 organizations = user.getOrganizations();
                 for (Organization org: organizations) {
                 	GrantedOrganizationModel organization = new GrantedOrganizationModel();
-                	organization.setGroupId(org.getGroupId());
+                	organization.setOrgId(org.getOrganizationId());
                 	usermodel.addOrganization(organization);
                 }
                 
