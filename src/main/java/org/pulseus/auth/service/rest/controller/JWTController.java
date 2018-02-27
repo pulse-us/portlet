@@ -22,7 +22,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.pulseus.auth.portlet.security.filter.PortletSecurityFilter;
+import org.pulseus.auth.portlet.security.model.JSONWebKeyRsaJoseJImpl;
 import org.springframework.security.crypto.codec.Base64;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -45,6 +45,8 @@ public class JWTController {
 	private static final String ORGANIZATIONS = "Orgs";
 	private static final String AUTHORITIES = "Authorities";
 	private static final String IDENTITY = "Identity";
+	private JSONWebKeyRsaJoseJImpl jwk = new JSONWebKeyRsaJoseJImpl();
+	private String subject;
 	
     @RequestMapping(value = "/auth/jwt", method = RequestMethod.GET, produces = "application/json")
     public String getJwt(HttpServletRequest request) throws PortalException {
@@ -79,12 +81,16 @@ public class JWTController {
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.HOUR, 1);  // number of days to add
 		Date expires = c.getTime();
-
+		
+		subject = userLoggedIn.getFullName();
 		
 		String jwt = Jwts.builder()
+		  .setSubject(subject)
     	  .setExpiration(expires)
     	  .addClaims(jwtClaims)
-    	  .signWith(SignatureAlgorithm.HS512, Base64.decode((configuration.get("jwt.key").getBytes()))).compact();
+    	  .setIssuer(configuration.get("jwtIssuer"))
+    	  .setAudience(configuration.get("jwtAudience"))
+    	  .signWith(SignatureAlgorithm.RS256, jwk.getPrivateKey()).compact();
 		
         String jwtJSON = "{\"token\": \""+ jwt +"\"}";
         
@@ -114,9 +120,12 @@ public class JWTController {
 		Date expires = c.getTime();
 
 		jwt = Jwts.builder()
+		  .setSubject(subject)
     	  .setExpiration(expires)
     	  .addClaims(jwtClaims)
-    	  .signWith(SignatureAlgorithm.HS512, Base64.decode((configuration.get("jwt.key").getBytes()))).compact();
+    	  .setIssuer(configuration.get("jwtIssuer"))
+    	  .setAudience(configuration.get("jwtAudience"))
+    	  .signWith(SignatureAlgorithm.RS256, jwk.getPrivateKey()).compact();
 		
         String jwtJSON = "{\"token\": \""+ jwt +"\"}";
         
@@ -145,9 +154,12 @@ public class JWTController {
 		Date expires = c.getTime();
 
 		jwt = Jwts.builder()
+		  .setSubject(subject)
     	  .setExpiration(expires)
     	  .addClaims(jwtClaims)
-    	  .signWith(SignatureAlgorithm.HS512, Base64.decode((configuration.get("jwt.key").getBytes()))).compact();
+    	  .setIssuer(configuration.get("jwtIssuer"))
+    	  .setAudience(configuration.get("jwtAudience"))
+    	  .signWith(SignatureAlgorithm.RS256, jwk.getPrivateKey()).compact();
 		
         String jwtJSON = "{\"token\": \""+ jwt +"\"}";
         
