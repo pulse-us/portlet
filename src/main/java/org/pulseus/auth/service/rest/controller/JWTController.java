@@ -103,7 +103,7 @@ public class JWTController {
         String oldJwt = authorization.split(" ")[1];
 
         // Parse old Jwt
-        Jwt<Header, Claims> claims = Jwts.parser().setSigningKey(Base64.decode(configuration.get("jwt.key").getBytes())).parse(oldJwt);
+        Jwt<Header, Claims> claims = Jwts.parser().setSigningKey(jwk.getPrivateKey()).parse(oldJwt);
         
         List<String> authorityInfo = (List<String>) claims.getBody().get("Authorities");
         List<String> identityInfo = (List<String>) claims.getBody().get("Identity");
@@ -138,7 +138,7 @@ public class JWTController {
         String oldJwt = authorization.split(" ")[1];
 
         // Parse old Jwt
-        Jwt<Header, Claims> claims = Jwts.parser().setSigningKey(Base64.decode(configuration.get("jwt.key").getBytes())).parse(oldJwt);
+        Jwt<Header, Claims> claims = Jwts.parser().setSigningKey(jwk.getPrivateKey()).parse(oldJwt);
         
         List<String> authorityInfo = (List<String>) claims.getBody().get("Authorities");
         List<String> identityInfo = (List<String>) claims.getBody().get("Identity");
