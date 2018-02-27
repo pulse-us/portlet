@@ -6,6 +6,7 @@ Designed to provide JWT from Liferay CE for use as authentication/authorization 
 1. Copy the portlet.properties.template file to portlet.properties file
 1. Copy the keylocation property from the service app
 1. Set jwtIssuer and jwtAudience to PULSE-US in both service application.properties and portlet.properties here
+to `PULSE-US`
 1. `./gradlew assemble` in root directory
 1. `cp build/libs/PULSEAuthPortlet.war <liferay-installation>/deploy/`
 1. Sign into Liferay
