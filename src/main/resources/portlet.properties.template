@@ -8,4 +8,6 @@ language.bundle=content.Language
 #
 resource.actions.configs=resource-actions/default.xml
 
-jwt.key
+keyLocation=<jose4jkeylocation>
+jwtIssuer=PULSE-US
+jwtAudience=PULSE-US
