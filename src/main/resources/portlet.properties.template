@@ -8,4 +8,6 @@ language.bundle=content.Language
 #
 resource.actions.configs=resource-actions/default.xml
 
-jwt.key
+keyLocation=C:\\Users\\blindsey\\dev\\pulseJSONPulseRsaJoseJWebKey.txt
+jwtIssuer=PULSE-US
+jwtAudience=PULSE-US
