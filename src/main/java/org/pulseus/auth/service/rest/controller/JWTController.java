@@ -94,8 +94,7 @@ public class JWTController {
 		System.out.println("adding users");
 		ServiceContext serviceContext = new ServiceContext();
 		Long companyId = CompanyThreadLocal.getCompanyId();	
-		Role role = RoleLocalServiceUtil.getRole(companyId, "Administrator");
-		Long roleId = 	role.getRoleId();
+		
 
 
 		BufferedReader br = null;
@@ -107,7 +106,8 @@ public class JWTController {
 
 			// use comma as separator
 			String[] value = line.split(cvsSplitBy);
-
+			Role role = RoleLocalServiceUtil.getRole(companyId, value[5]);
+			Long roleId = 	role.getRoleId();
 
 			long creatorUserId = 0;
 			boolean autoPassword = false;
