@@ -146,9 +146,8 @@ public class JWTController {
 					birthdayMonth, birthdayDay, birthdayYear, jobTitle, groupIds,
 					organizationIds, roleIds, userGroupIds, sendEmail, serviceContext);
 
-			/*user = UserLocalServiceUtil.updateEmailAddressVerified(user.getUserId(), true);
-
-			user = UserLocalServiceUtil.updatePasswordReset(user.getUserId(), false);*/
+			user = UserLocalServiceUtil.updateEmailAddressVerified(user.getUserId(), true);
+			user = UserLocalServiceUtil.updatePasswordReset(user.getUserId(), false);
 
 			System.out.println("user added");
 		}
