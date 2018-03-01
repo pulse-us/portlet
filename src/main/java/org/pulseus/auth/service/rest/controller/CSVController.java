@@ -31,7 +31,7 @@ public class CSVController {
 
 	private static final Logger log = LogManager.getLogger(JWTController.class);
 	
-	@RequestMapping(value = "/addusersnew", method = RequestMethod.GET)
+	@RequestMapping(value = "/addusers", method = RequestMethod.GET)
 	public void addusers() throws Exception {
 		System.out.println("adding users");
 		ServiceContext serviceContext = new ServiceContext();
