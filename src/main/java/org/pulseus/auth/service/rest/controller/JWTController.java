@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
@@ -108,7 +109,13 @@ public class JWTController {
 			String[] value = line.split(cvsSplitBy);
 			Role role = RoleLocalServiceUtil.getRole(companyId, value[5]);
 			Long roleId = 	role.getRoleId();
+			
+			Organization org1 = OrganizationLocalServiceUtil.getOrganization(companyId, value[6]);
+			Long orgId1 = org1.getOrganizationId();
 
+			Organization org2 = OrganizationLocalServiceUtil.getOrganization(companyId, value[7]);
+			Long orgId2 = org2.getOrganizationId();
+			
 			long creatorUserId = 0;
 			boolean autoPassword = false;
 			boolean autoScreenName = false;
@@ -124,7 +131,7 @@ public class JWTController {
 			int birthdayYear = 1970;
 			String jobTitle = StringPool.BLANK;
 			long[] groupIds = null;
-			long[] organizationIds = null;
+			long[] organizationIds = {orgId1,orgId2};
 			long[] roleIds = {roleId};
 			long[] userGroupIds = null;
 			boolean sendEmail = false;
