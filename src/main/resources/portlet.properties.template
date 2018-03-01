@@ -14,3 +14,5 @@ jwtAudience=PULSE-US
 jwtAllowedClockSkew=30
 jwtExpirationTimeMinutesInTheFuture=30
 jwtNotBeforeMinutesInThePast=4
+
+portalUrl=https://localhost:3000

@@ -179,9 +179,5 @@ gradle-app.setting
 ########################################
 ### Project specific ###
 ########################################
-logs/
-/src/test/resources/environment.test.properties
-/src/main/resources/application.properties
-/src/main/resources/keystore.p12
-/src/main/resources/server.cer
 /src/main/resources/portlet.properties
+.checkstyle
