@@ -1,7 +1,7 @@
 package org.pulseus.auth.service.rest.controller;
 
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -102,7 +102,7 @@ public class JWTController {
 		String line = "";
 		String cvsSplitBy = ",";
 
-		br = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/" + "users.csv")));
+		br = new BufferedReader(new FileReader("/opt/pulse/users.csv"));
 		while ((line = br.readLine()) != null) {
 
 			// use comma as separator
