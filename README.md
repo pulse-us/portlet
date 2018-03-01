@@ -1,7 +1,8 @@
-### Portlet for PULSE-US
+# Portlet for PULSE-US
+
 Designed to provide JWT from Liferay CE for use as authentication/authorization token
 
-### Deploy Instructions
+## Deploy Instructions
 
 1. Copy the portlet.properties.template file to portlet.properties file
 1. Copy the keylocation property from the service app
@@ -13,3 +14,12 @@ to `PULSE-US`
 1. Click addition symbol in top right corner
 1. Applications -> PULSE -> PULSE Auth Portlet -> Add
 1. Should see a portlet show up on the left called PULSE Auth Portlet
+
+## Re-deployment
+
+Once the portlet has been deployed, when it needs to be re-deployed set an environment variable and then run the deploy script:
+
+```
+> export PULSE_LIFERAY=/the/directory/where/liferay/lives
+> ./deploy-portlet.sh
+```

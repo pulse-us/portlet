@@ -11,3 +11,6 @@ resource.actions.configs=resource-actions/default.xml
 keyLocation=<jose4jkeylocation>
 jwtIssuer=PULSE-US
 jwtAudience=PULSE-US
+jwtAllowedClockSkew=30
+jwtExpirationTimeMinutesInTheFuture=30
+jwtNotBeforeMinutesInThePast=4
