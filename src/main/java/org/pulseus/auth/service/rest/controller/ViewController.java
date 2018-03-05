@@ -10,18 +10,39 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.ModelAndView;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 
+import com.liferay.portal.kernel.configuration.Configuration;
+import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+
+/**
+ * View controller for basic rendering.
+ * @author alarned
+ *
+ */
 @Controller
 @RequestMapping("view")
 public class ViewController {
 
-	@RenderMapping()
-	public ModelAndView handleRenderRequest(RenderRequest request, RenderResponse response) throws IOException {
+    private Configuration configuration = ConfigurationFactoryUtil
+            .getConfiguration(PortalClassLoaderUtil.getClassLoader(), "portlet");
 
-		ModelAndView modelAndView = new ModelAndView();
+    /**
+     * Handles requests for rendering.
+     * @param request request to handle
+     * @param response response to handle
+     * @return model and view object
+     * @throws IOException if needed
+     */
+    @RenderMapping()
+    public ModelAndView handleRenderRequest(final RenderRequest request, final RenderResponse response)
+            throws IOException {
 
-		modelAndView.setViewName("view");
+        ModelAndView modelAndView = new ModelAndView();
 
-		return modelAndView;
-	}
-	
+        modelAndView.setViewName("view");
+        request.setAttribute("portalUrl", configuration.get("portalUrl"));
+
+        return modelAndView;
+    }
+
 }
