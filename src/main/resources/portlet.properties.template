@@ -15,5 +15,5 @@ jwtAllowedClockSkew=30
 jwtExpirationTimeMinutesInTheFuture=30
 jwtNotBeforeMinutesInThePast=4
 portalUrl=https://localhost:3000
-csvfile=/opt/pulse/users.csv
+csvFile=/opt/pulse/users.csv
 

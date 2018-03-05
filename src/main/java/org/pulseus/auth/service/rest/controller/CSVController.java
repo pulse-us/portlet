@@ -44,7 +44,7 @@ public class CSVController {
 		String cvsSplitBy = ",";
 		
 
-		br = new BufferedReader(new FileReader(configuration.get("csvfile")));
+		br = new BufferedReader(new FileReader(configuration.get("csvFile")));
 		
 		long creatorUserId = 0;
 		boolean autoPassword = false;
