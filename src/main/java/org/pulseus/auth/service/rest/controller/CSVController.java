@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.liferay.portal.kernel.configuration.Configuration;
+import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
@@ -21,6 +23,7 @@ import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
 
 @RestController
@@ -33,7 +36,7 @@ public class CSVController {
 		log.info("adding users");
 		ServiceContext serviceContext = new ServiceContext();
 		Long companyId = CompanyThreadLocal.getCompanyId();	
-
+		Configuration configuration = ConfigurationFactoryUtil.getConfiguration(PortalClassLoaderUtil.getClassLoader(), "portlet");
 
 
 		BufferedReader br = null;
@@ -41,7 +44,7 @@ public class CSVController {
 		String cvsSplitBy = ",";
 		
 
-		br = new BufferedReader(new FileReader("/opt/pulse/users.csv"));
+		br = new BufferedReader(new FileReader(configuration.get("csvfile")));
 		
 		long creatorUserId = 0;
 		boolean autoPassword = false;
