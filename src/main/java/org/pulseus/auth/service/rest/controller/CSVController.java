@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.liferay.portal.kernel.configuration.Configuration;
-import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
@@ -22,18 +20,16 @@ import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
-import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
 
 @RestController
 public class CSVController {
-	Configuration configuration = ConfigurationFactoryUtil.getConfiguration(PortalClassLoaderUtil.getClassLoader(), "portlet");
 
 	private static final Logger log = LogManager.getLogger(JWTController.class);
 
 	@RequestMapping(value = "/addusers", method = RequestMethod.GET)
 	public void addusers() throws Exception {
-		System.out.println("adding users");
+		log.info("adding users");
 		ServiceContext serviceContext = new ServiceContext();
 		Long companyId = CompanyThreadLocal.getCompanyId();	
 
@@ -42,8 +38,28 @@ public class CSVController {
 		BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ",";
+		
 
 		br = new BufferedReader(new FileReader("/opt/pulse/users.csv"));
+		
+		long creatorUserId = 0;
+		boolean autoPassword = false;
+		boolean autoScreenName = false;
+		long facebookId = 0;
+		String openId = StringPool.BLANK;
+		Locale locale = serviceContext.getLocale();
+		String middleName = StringPool.BLANK;
+		int prefixId = 0;
+		int suffixId = 0;
+		boolean male = true;
+		int birthdayMonth = Calendar.JANUARY;
+		int birthdayDay = 1;
+		int birthdayYear = 1970;
+		String jobTitle = StringPool.BLANK;
+		long[] groupIds = null;
+		long[] userGroupIds = null;
+		boolean sendEmail = false;
+		
 		while (true) {
 			try {
 				if ((line = br.readLine()) != null) {
@@ -58,25 +74,8 @@ public class CSVController {
 					Organization org2 = OrganizationLocalServiceUtil.getOrganization(companyId, value[7]);
 					Long orgId2 = org2.getOrganizationId();
 
-					long creatorUserId = 0;
-					boolean autoPassword = false;
-					boolean autoScreenName = false;
-					long facebookId = 0;
-					String openId = StringPool.BLANK;
-					Locale locale = serviceContext.getLocale();
-					String middleName = StringPool.BLANK;
-					int prefixId = 0;
-					int suffixId = 0;
-					boolean male = true;
-					int birthdayMonth = Calendar.JANUARY;
-					int birthdayDay = 1;
-					int birthdayYear = 1970;
-					String jobTitle = StringPool.BLANK;
-					long[] groupIds = null;
 					long[] organizationIds = {orgId1,orgId2};
 					long[] roleIds = {roleId};
-					long[] userGroupIds = null;
-					boolean sendEmail = false;
 
 					String screenName = value[0];
 					String emailAddress = value[1];
@@ -98,17 +97,18 @@ public class CSVController {
 					user = UserLocalServiceUtil.updateEmailAddressVerified(user.getUserId(), true);
 					user = UserLocalServiceUtil.updatePasswordReset(user.getUserId(), false);
 
-					System.out.println("user added");
-					
+					log.info("user added "+value[0]);
+
 				}
 			}
 
 			catch(Exception e) {
-				System.out.println(e.getMessage());
+				log.info(e.getMessage());
+				log.info("The line causing error is" + line.split(cvsSplitBy));
 				continue;
 			}
-			
+
 		}
-		
+
 	}
 }
