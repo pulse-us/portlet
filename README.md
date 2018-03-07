@@ -23,3 +23,13 @@ Once the portlet has been deployed, when it needs to be re-deployed set an envir
 > export PULSE_LIFERAY=/the/directory/where/liferay/lives
 > ./deploy-portlet.sh
 ```
+
+## Checkstyle
+
+During development checkstyle will be run as part of the build process. If a build needs to bypass checkstyle, it can be done with a command similar to:
+
+```
+> ./gradlew build -x checkstyleMain
+```
+
+Though the end goal is to have the project pass all of the checkstyle rules, until that is possible they can be ignored for now, with the understanding that as development progresses we want to avoid adding new errors, and continue to burn down old ones.
