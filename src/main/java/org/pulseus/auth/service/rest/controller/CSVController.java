@@ -44,18 +44,18 @@ public class CSVController {
 		BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ",";
-		
+
 		Organization parentOrganization = OrganizationLocalServiceUtil.getOrganization(companyId, "pulse-us");
 		Long parentOrganizationId = parentOrganization.getOrganizationId();
-		System.out.println("List of Orgs---->"+OrganizationLocalServiceUtil.getOrganizations(companyId, parentOrganizationId).get(0).getName());
 		List<Organization> orgList = OrganizationLocalServiceUtil.getOrganizations(companyId, parentOrganizationId);
 		List<String> orgNames = new ArrayList<String>();
 		for (Organization org : orgList) {
 			orgNames.add(org.getName());
 		}
-		System.out.println(orgNames);
+
+
 		br = new BufferedReader(new FileReader(configuration.get("csvfile")));
-		
+
 		long creatorUserId = 0;
 		boolean autoPassword = false;
 		boolean autoScreenName = false;
@@ -73,7 +73,9 @@ public class CSVController {
 		long[] groupIds = null;
 		long[] userGroupIds = null;
 		boolean sendEmail = false;
-		
+		Organization org1;
+		Long orgId1 = null;
+
 		while (true) {
 			try {
 				if ((line = br.readLine()) != null) {
@@ -82,9 +84,16 @@ public class CSVController {
 					Role role = RoleLocalServiceUtil.getRole(companyId, value[5]);
 					Long roleId = 	role.getRoleId();
 
-					Organization org1 = OrganizationLocalServiceUtil.getOrganization(companyId, value[6]);
-					Long orgId1 = org1.getOrganizationId();
-
+					if(orgNames.contains(value[6])) {
+						org1 = OrganizationLocalServiceUtil.getOrganization(companyId, value[6]);
+						orgId1 = org1.getOrganizationId();
+					}
+					else {
+						User user1 = UserLocalServiceUtil.getUserByScreenName(companyId, "test");
+						OrganizationLocalServiceUtil.addOrganization(user1.getPrimaryKey(), parentOrganizationId, value[6], false);
+						org1 = OrganizationLocalServiceUtil.getOrganization(companyId, value[6]);
+						orgId1 = org1.getOrganizationId();
+					}
 					Organization org2 = OrganizationLocalServiceUtil.getOrganization(companyId, value[7]);
 					Long orgId2 = org2.getOrganizationId();
 
@@ -114,8 +123,12 @@ public class CSVController {
 					log.info("user added "+value[0]);
 
 
-					
-					
+
+
+				}
+				
+				else {
+					break;
 				}
 			}
 
