@@ -2,8 +2,10 @@ package org.pulseus.auth.service.rest.controller;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -43,7 +45,15 @@ public class CSVController {
 		String line = "";
 		String cvsSplitBy = ",";
 		
-
+		Organization parentOrganization = OrganizationLocalServiceUtil.getOrganization(companyId, "pulse-us");
+		Long parentOrganizationId = parentOrganization.getOrganizationId();
+		System.out.println("List of Orgs---->"+OrganizationLocalServiceUtil.getOrganizations(companyId, parentOrganizationId).get(0).getName());
+		List<Organization> orgList = OrganizationLocalServiceUtil.getOrganizations(companyId, parentOrganizationId);
+		List<String> orgNames = new ArrayList<String>();
+		for (Organization org : orgList) {
+			orgNames.add(org.getName());
+		}
+		System.out.println(orgNames);
 		br = new BufferedReader(new FileReader(configuration.get("csvfile")));
 		
 		long creatorUserId = 0;
@@ -103,6 +113,9 @@ public class CSVController {
 
 					log.info("user added "+value[0]);
 
+
+					
+					
 				}
 			}
 
