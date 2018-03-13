@@ -104,7 +104,7 @@ public class CSVController {
 						subOrgNames.add(org.getName());
 					}
 
-					//create an suborg if the org is not present
+					//create a suborg if the suborg is not present
 					if(subOrgNames.contains(value[7])) {
 						org2 = OrganizationLocalServiceUtil.getOrganization(companyId, value[7]);
 						orgId2 = org2.getOrganizationId();
