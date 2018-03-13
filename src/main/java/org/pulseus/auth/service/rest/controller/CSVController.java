@@ -39,7 +39,7 @@ public class CSVController {
 		ServiceContext serviceContext = new ServiceContext();
 		Long companyId = CompanyThreadLocal.getCompanyId();	
 		Configuration configuration = ConfigurationFactoryUtil.getConfiguration(PortalClassLoaderUtil.getClassLoader(), "portlet");
-
+		User user1 = UserLocalServiceUtil.getUserByScreenName(companyId, "test");
 
 		BufferedReader br = null;
 		String line = "";
@@ -49,6 +49,7 @@ public class CSVController {
 		Long parentOrganizationId = parentOrganization.getOrganizationId();
 		List<Organization> orgList = OrganizationLocalServiceUtil.getOrganizations(companyId, parentOrganizationId);
 		List<String> orgNames = new ArrayList<String>();
+		List<String> subOrgNames = new ArrayList<String>();
 		for (Organization org : orgList) {
 			orgNames.add(org.getName());
 		}
@@ -74,7 +75,10 @@ public class CSVController {
 		long[] userGroupIds = null;
 		boolean sendEmail = false;
 		Organization org1;
+		Organization org2;
 		Long orgId1 = null;
+		Long orgId2 = null;
+
 
 		while (true) {
 			try {
@@ -84,19 +88,34 @@ public class CSVController {
 					Role role = RoleLocalServiceUtil.getRole(companyId, value[5]);
 					Long roleId = 	role.getRoleId();
 
+					//create an org if the org is not present
 					if(orgNames.contains(value[6])) {
 						org1 = OrganizationLocalServiceUtil.getOrganization(companyId, value[6]);
 						orgId1 = org1.getOrganizationId();
 					}
 					else {
-						User user1 = UserLocalServiceUtil.getUserByScreenName(companyId, "test");
 						OrganizationLocalServiceUtil.addOrganization(user1.getPrimaryKey(), parentOrganizationId, value[6], false);
+						log.info("New organization created "+value[6]);
 						org1 = OrganizationLocalServiceUtil.getOrganization(companyId, value[6]);
 						orgId1 = org1.getOrganizationId();
 					}
-					Organization org2 = OrganizationLocalServiceUtil.getOrganization(companyId, value[7]);
-					Long orgId2 = org2.getOrganizationId();
+					List<Organization> subOrgList = OrganizationLocalServiceUtil.getOrganizations(companyId, orgId1);
+					for (Organization org : subOrgList) {
+						subOrgNames.add(org.getName());
+					}
 
+					//create an suborg if the org is not present
+					if(subOrgNames.contains(value[7])) {
+						org2 = OrganizationLocalServiceUtil.getOrganization(companyId, value[7]);
+						orgId2 = org2.getOrganizationId();
+					}
+
+					else {
+						OrganizationLocalServiceUtil.addOrganization(user1.getPrimaryKey(), orgId1, value[7], false);
+						log.info("New sub-organization created "+value[7]);
+						org2 = OrganizationLocalServiceUtil.getOrganization(companyId, value[7]);
+						orgId2 = org2.getOrganizationId();
+					}
 					long[] organizationIds = {orgId1,orgId2};
 					long[] roleIds = {roleId};
 
@@ -126,7 +145,7 @@ public class CSVController {
 
 
 				}
-				
+
 				else {
 					break;
 				}
