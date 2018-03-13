@@ -2,8 +2,10 @@ package org.pulseus.auth.service.rest.controller;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -37,15 +39,24 @@ public class CSVController {
 		ServiceContext serviceContext = new ServiceContext();
 		Long companyId = CompanyThreadLocal.getCompanyId();	
 		Configuration configuration = ConfigurationFactoryUtil.getConfiguration(PortalClassLoaderUtil.getClassLoader(), "portlet");
-
+		User user1 = UserLocalServiceUtil.getUserByScreenName(companyId, "test");
 
 		BufferedReader br = null;
 		String line = "";
 		String cvsSplitBy = ",";
-		
 
-		br = new BufferedReader(new FileReader(configuration.get("csvFile")));
-		
+		Organization parentOrganization = OrganizationLocalServiceUtil.getOrganization(companyId, "pulse-us");
+		Long parentOrganizationId = parentOrganization.getOrganizationId();
+		List<Organization> orgList = OrganizationLocalServiceUtil.getOrganizations(companyId, parentOrganizationId);
+		List<String> orgNames = new ArrayList<String>();
+		List<String> subOrgNames = new ArrayList<String>();
+		for (Organization org : orgList) {
+			orgNames.add(org.getName());
+		}
+
+
+		br = new BufferedReader(new FileReader(configuration.get("csvfile")));
+
 		long creatorUserId = 0;
 		boolean autoPassword = false;
 		boolean autoScreenName = false;
@@ -63,7 +74,12 @@ public class CSVController {
 		long[] groupIds = null;
 		long[] userGroupIds = null;
 		boolean sendEmail = false;
-		
+		Organization org1;
+		Organization org2;
+		Long orgId1 = null;
+		Long orgId2 = null;
+
+
 		while (true) {
 			try {
 				if ((line = br.readLine()) != null) {
@@ -72,12 +88,34 @@ public class CSVController {
 					Role role = RoleLocalServiceUtil.getRole(companyId, value[5]);
 					Long roleId = 	role.getRoleId();
 
-					Organization org1 = OrganizationLocalServiceUtil.getOrganization(companyId, value[6]);
-					Long orgId1 = org1.getOrganizationId();
+					//create an org if the org is not present
+					if(orgNames.contains(value[6])) {
+						org1 = OrganizationLocalServiceUtil.getOrganization(companyId, value[6]);
+						orgId1 = org1.getOrganizationId();
+					}
+					else {
+						OrganizationLocalServiceUtil.addOrganization(user1.getPrimaryKey(), parentOrganizationId, value[6], false);
+						log.info("New organization created "+value[6]);
+						org1 = OrganizationLocalServiceUtil.getOrganization(companyId, value[6]);
+						orgId1 = org1.getOrganizationId();
+					}
+					List<Organization> subOrgList = OrganizationLocalServiceUtil.getOrganizations(companyId, orgId1);
+					for (Organization org : subOrgList) {
+						subOrgNames.add(org.getName());
+					}
 
-					Organization org2 = OrganizationLocalServiceUtil.getOrganization(companyId, value[7]);
-					Long orgId2 = org2.getOrganizationId();
+					//create an suborg if the org is not present
+					if(subOrgNames.contains(value[7])) {
+						org2 = OrganizationLocalServiceUtil.getOrganization(companyId, value[7]);
+						orgId2 = org2.getOrganizationId();
+					}
 
+					else {
+						OrganizationLocalServiceUtil.addOrganization(user1.getPrimaryKey(), orgId1, value[7], false);
+						log.info("New sub-organization created "+value[7]);
+						org2 = OrganizationLocalServiceUtil.getOrganization(companyId, value[7]);
+						orgId2 = org2.getOrganizationId();
+					}
 					long[] organizationIds = {orgId1,orgId2};
 					long[] roleIds = {roleId};
 
@@ -102,7 +140,10 @@ public class CSVController {
 					user = UserLocalServiceUtil.updatePasswordReset(user.getUserId(), false);
 
 					log.info("user added "+value[0]);
+				}
 
+				else {
+					break;
 				}
 			}
 
