@@ -2,6 +2,9 @@ package org.pulseus.auth.service.rest.controller;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -9,6 +12,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +39,7 @@ public class CSVController {
 
 	private static final Logger log = LogManager.getLogger(JWTController.class);
 
+
 	@RequestMapping(value = "/addusers", method = RequestMethod.GET)
 	public void addusers() throws Exception {
 		log.info("adding users");
@@ -40,10 +47,7 @@ public class CSVController {
 		Long companyId = CompanyThreadLocal.getCompanyId();	
 		Configuration configuration = ConfigurationFactoryUtil.getConfiguration(PortalClassLoaderUtil.getClassLoader(), "portlet");
 		User user1 = UserLocalServiceUtil.getUserByScreenName(companyId, "test");
-
-		BufferedReader br = null;
-		String line = "";
-		String cvsSplitBy = ",";
+		final String CSV_FILE_PATH = configuration.get("csvfile");
 
 		Organization parentOrganization = OrganizationLocalServiceUtil.getOrganization(companyId, "pulse-us");
 		Long parentOrganizationId = parentOrganization.getOrganizationId();
@@ -54,8 +58,13 @@ public class CSVController {
 			orgNames.add(org.getName());
 		}
 
+		Reader reader = Files.newBufferedReader(Paths.get(CSV_FILE_PATH));
+		CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT
+				.withFirstRecordAsHeader()
+				.withIgnoreHeaderCase()
+				.withTrim());
 
-		br = new BufferedReader(new FileReader(configuration.get("csvfile")));
+		Iterable<CSVRecord> csvRecords = csvParser.getRecords();
 
 		long creatorUserId = 0;
 		boolean autoPassword = false;
@@ -80,80 +89,69 @@ public class CSVController {
 		Long orgId2 = null;
 
 
-		while (true) {
-			try {
-				if ((line = br.readLine()) != null) {
-					// use comma as separator
-					String[] value = line.split(cvsSplitBy);
-					Role role = RoleLocalServiceUtil.getRole(companyId, value[5]);
-					Long roleId = 	role.getRoleId();
+		for (CSVRecord csvRecord : csvRecords) {
+			try {			
+				Role role = RoleLocalServiceUtil.getRole(companyId, csvRecord.get("role"));
+				Long roleId = 	role.getRoleId();
 
-					//create an org if the org is not present
-					if(orgNames.contains(value[6])) {
-						org1 = OrganizationLocalServiceUtil.getOrganization(companyId, value[6]);
-						orgId1 = org1.getOrganizationId();
-					}
-					else {
-						OrganizationLocalServiceUtil.addOrganization(user1.getPrimaryKey(), parentOrganizationId, value[6], false);
-						log.info("New organization created "+value[6]);
-						org1 = OrganizationLocalServiceUtil.getOrganization(companyId, value[6]);
-						orgId1 = org1.getOrganizationId();
-					}
-					List<Organization> subOrgList = OrganizationLocalServiceUtil.getOrganizations(companyId, orgId1);
-					for (Organization org : subOrgList) {
-						subOrgNames.add(org.getName());
-					}
+				//create an org if the org is not present
+				if(orgNames.contains(csvRecord.get("org1"))) {
+					org1 = OrganizationLocalServiceUtil.getOrganization(companyId, csvRecord.get("org1"));
+					orgId1 = org1.getOrganizationId();
+				}
+				else {
+					OrganizationLocalServiceUtil.addOrganization(user1.getPrimaryKey(), parentOrganizationId, csvRecord.get("org1"), false);
+					log.info("New organization created "+csvRecord.get("org1"));
+					org1 = OrganizationLocalServiceUtil.getOrganization(companyId, csvRecord.get("org1"));
+					orgId1 = org1.getOrganizationId();
+				}
+				List<Organization> subOrgList = OrganizationLocalServiceUtil.getOrganizations(companyId, orgId1);
+				for (Organization org : subOrgList) {
+					subOrgNames.add(org.getName());
+				}
 
-					//create an suborg if the org is not present
-					if(subOrgNames.contains(value[7])) {
-						org2 = OrganizationLocalServiceUtil.getOrganization(companyId, value[7]);
-						orgId2 = org2.getOrganizationId();
-					}
-
-					else {
-						OrganizationLocalServiceUtil.addOrganization(user1.getPrimaryKey(), orgId1, value[7], false);
-						log.info("New sub-organization created "+value[7]);
-						org2 = OrganizationLocalServiceUtil.getOrganization(companyId, value[7]);
-						orgId2 = org2.getOrganizationId();
-					}
-					long[] organizationIds = {orgId1,orgId2};
-					long[] roleIds = {roleId};
-
-					String screenName = value[0];
-					String emailAddress = value[1];
-					String firstName = value[2];
-					String lastName = value[3];
-					String password1 = value[4];
-					String password2 = value[4];
-
-					String uuid = UUID.randomUUID().toString().replace("-", "");
-					serviceContext.setUuid(uuid);
-
-					User user = UserLocalServiceUtil.addUser(
-							creatorUserId, companyId, autoPassword, password1, password2,
-							autoScreenName, screenName, emailAddress, facebookId, openId,
-							locale, firstName, middleName, lastName, prefixId, suffixId, male,
-							birthdayMonth, birthdayDay, birthdayYear, jobTitle, groupIds,
-							organizationIds, roleIds, userGroupIds, sendEmail, serviceContext);
-
-					user = UserLocalServiceUtil.updateEmailAddressVerified(user.getUserId(), true);
-					user = UserLocalServiceUtil.updatePasswordReset(user.getUserId(), false);
-
-					log.info("user added "+value[0]);
-
-
-
-
+				//create a suborg if the suborg is not present
+				if(subOrgNames.contains(csvRecord.get("org2"))) {
+					org2 = OrganizationLocalServiceUtil.getOrganization(companyId, csvRecord.get("org2"));
+					orgId2 = org2.getOrganizationId();
 				}
 
 				else {
-					break;
+					OrganizationLocalServiceUtil.addOrganization(user1.getPrimaryKey(), orgId1, csvRecord.get("org2"), false);
+					log.info("New sub-organization created "+csvRecord.get("org2"));
+					org2 = OrganizationLocalServiceUtil.getOrganization(companyId, csvRecord.get("org2"));
+					orgId2 = org2.getOrganizationId();
 				}
+				long[] organizationIds = {orgId1,orgId2};
+				long[] roleIds = {roleId};
+
+				String screenName = csvRecord.get("username");
+				String emailAddress = csvRecord.get("email");
+				String firstName = csvRecord.get("firstname");
+				String lastName = csvRecord.get("lastname");
+				String password1 = csvRecord.get("password");
+				String password2 = csvRecord.get("password");
+
+				String uuid = UUID.randomUUID().toString().replace("-", "");
+				serviceContext.setUuid(uuid);
+
+				User user = UserLocalServiceUtil.addUser(
+						creatorUserId, companyId, autoPassword, password1, password2,
+						autoScreenName, screenName, emailAddress, facebookId, openId,
+						locale, firstName, middleName, lastName, prefixId, suffixId, male,
+						birthdayMonth, birthdayDay, birthdayYear, jobTitle, groupIds,
+						organizationIds, roleIds, userGroupIds, sendEmail, serviceContext);
+
+				user = UserLocalServiceUtil.updateEmailAddressVerified(user.getUserId(), true);
+				user = UserLocalServiceUtil.updatePasswordReset(user.getUserId(), false);
+
+				log.info("user added "+csvRecord.get("username"));
+
 			}
 
 			catch(Exception e) {
 				log.info(e.getMessage());
-				log.info("The line causing error is " + Arrays.toString(line.split(cvsSplitBy)));
+				log.info("The line causing error is " + csvRecord.toString());
 				continue;
 			}
 
