@@ -93,36 +93,50 @@ public class CSVController {
 			try {			
 				Role role = RoleLocalServiceUtil.getRole(companyId, csvRecord.get("role"));
 				Long roleId = 	role.getRoleId();
-
-				//create an org if the org is not present
-				if(orgNames.contains(csvRecord.get("stateOrg"))) {
-					stateOrg = OrganizationLocalServiceUtil.getOrganization(companyId, csvRecord.get("stateOrg"));
-					orgId1 = stateOrg.getOrganizationId();
+				if(csvRecord.get("role").equals("ROLE_ORG_ADMIN") || csvRecord.get("role").equals("ROLE_PROVIDER")) {
+					//create an org if the org is not present
+					if(orgNames.contains(csvRecord.get("stateOrg"))) {
+						stateOrg = OrganizationLocalServiceUtil.getOrganization(companyId, csvRecord.get("stateOrg"));
+						orgId1 = stateOrg.getOrganizationId();
+					}
+					else {
+						OrganizationLocalServiceUtil.addOrganization(user1.getPrimaryKey(), parentOrganizationId, csvRecord.get("stateOrg"), false);
+						log.info("New organization created "+csvRecord.get("stateOrg"));
+						stateOrg = OrganizationLocalServiceUtil.getOrganization(companyId, csvRecord.get("stateOrg"));
+						orgId1 = stateOrg.getOrganizationId();
+					}
 				}
+
 				else {
-					OrganizationLocalServiceUtil.addOrganization(user1.getPrimaryKey(), parentOrganizationId, csvRecord.get("stateOrg"), false);
-					log.info("New organization created "+csvRecord.get("stateOrg"));
-					stateOrg = OrganizationLocalServiceUtil.getOrganization(companyId, csvRecord.get("stateOrg"));
-					orgId1 = stateOrg.getOrganizationId();
+					log.info("A state org can only be assigned to a user with roles ROLE_ORG_ADMIN or ROLE_PROVIDER");
 				}
 				List<Organization> subOrgList = OrganizationLocalServiceUtil.getOrganizations(companyId, orgId1);
 				for (Organization org : subOrgList) {
 					subOrgNames.add(org.getName());
 				}
+				if((!(csvRecord.get("role").equals("ROLE_ORG_ADMIN")))) {
+					//create a suborg if the suborg is not present
+					if(subOrgNames.contains(csvRecord.get("acfOrg"))) {
+						acfOrg = OrganizationLocalServiceUtil.getOrganization(companyId, csvRecord.get("acfOrg"));
+						orgId2 = acfOrg.getOrganizationId();
+					}
 
-				//create a suborg if the suborg is not present
-				if(subOrgNames.contains(csvRecord.get("acfOrg"))) {
-					acfOrg = OrganizationLocalServiceUtil.getOrganization(companyId, csvRecord.get("acfOrg"));
-					orgId2 = acfOrg.getOrganizationId();
+					else {
+						OrganizationLocalServiceUtil.addOrganization(user1.getPrimaryKey(), orgId1, csvRecord.get("acfOrg"), false);
+						log.info("New sub-organization created "+csvRecord.get("acfOrg"));
+						acfOrg = OrganizationLocalServiceUtil.getOrganization(companyId, csvRecord.get("acfOrg"));
+						orgId2 = acfOrg.getOrganizationId();
+					}
 				}
-
+				
+				long[] organizationIds;
+				if(orgId2 != null) {
+					organizationIds=  new long[]{orgId1,orgId2};
+				}
 				else {
-					OrganizationLocalServiceUtil.addOrganization(user1.getPrimaryKey(), orgId1, csvRecord.get("acfOrg"), false);
-					log.info("New sub-organization created "+csvRecord.get("acfOrg"));
-					acfOrg = OrganizationLocalServiceUtil.getOrganization(companyId, csvRecord.get("acfOrg"));
-					orgId2 = acfOrg.getOrganizationId();
+					organizationIds=new long[]{orgId1};
 				}
-				long[] organizationIds = {orgId1,orgId2};
+				
 				long[] roleIds = {roleId};
 
 				String screenName = csvRecord.get("username");
