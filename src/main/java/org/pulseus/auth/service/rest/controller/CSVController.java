@@ -82,11 +82,12 @@ public class CSVController {
 		boolean sendEmail = false;
 		Organization stateOrg;
 		Organization acfOrg;
-		Long orgId1 = null;
-		Long orgId2 = null;
+		
 
 		for (CSVRecord csvRecord : csvRecords) {
 			long[] organizationIds = null;
+			Long orgId1 = null;
+			Long orgId2 = null;
 			try {			
 				Role role = RoleLocalServiceUtil.getRole(companyId, csvRecord.get("role"));
 				Long roleId = 	role.getRoleId();
