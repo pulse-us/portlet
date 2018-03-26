@@ -42,7 +42,7 @@ ROLEs determine what a PULSE User is able to do in the PULSE system. The Role Ba
 
 ### Liferay Organizations
 
-The top level Organization in Liferay is `pulse-us`. Only ROLE_ADMIN may be assigned to this Organization. The first sub-organization level are the implementation-specific organizationss, and all have the form `pulse-*`, where `*` can be any string except `us`. All ACFs are sub-organizations of one of the implementation-specific organizations, and can take any form, as long as it doesn't start with `pulse-`
+The top level Organization in Liferay is `pulse-us`. Only ROLE_ADMIN may be assigned to this Organization. The first sub-organization level are the implementation-specific organizations, and all have the form `pulse-*`, where `*` can be any string except `us`. All ACFs are sub-organizations of one of the implementation-specific organizations, and can take any form, as long as it doesn't start with `pulse-`
 
 ## Checkstyle
 
