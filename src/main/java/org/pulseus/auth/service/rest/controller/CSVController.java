@@ -1,12 +1,9 @@
 package org.pulseus.auth.service.rest.controller;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -47,7 +44,7 @@ public class CSVController {
 		Long companyId = CompanyThreadLocal.getCompanyId();	
 		Configuration configuration = ConfigurationFactoryUtil.getConfiguration(PortalClassLoaderUtil.getClassLoader(), "portlet");
 		User user1 = UserLocalServiceUtil.getUserByScreenName(companyId, "test");
-		final String CSV_FILE_PATH = configuration.get("csvfile");
+		final String CSV_FILE_PATH = configuration.get("csvFile");
 
 		Organization parentOrganization = OrganizationLocalServiceUtil.getOrganization(companyId, "pulse-us");
 		Long parentOrganizationId = parentOrganization.getOrganizationId();
@@ -89,11 +86,15 @@ public class CSVController {
 
 		for (CSVRecord csvRecord : csvRecords) {
 			long[] organizationIds = null;
+			long[] roleIds = null;
 			Long orgId1 = null;
 			Long orgId2 = null;
 			try {			
 				Role role = RoleLocalServiceUtil.getRole(companyId, csvRecord.get("role"));
 				Long roleId = 	role.getRoleId();
+				
+				Role orgAdminRole = RoleLocalServiceUtil.getRole(companyId, "Organization Administrator");
+				Long orgAdminRoleId = 	orgAdminRole.getRoleId();
 
 
 				if(csvRecord.get("role").equals("ROLE_ADMIN")) {
@@ -143,9 +144,13 @@ public class CSVController {
 					organizationIds=new long[]{orgId1};
 				}
 
+				if(csvRecord.get("role").equals("ROLE_ORG_ADMIN")) {
+					 roleIds = new long[]{roleId,orgAdminRoleId};
+				}
 
-				long[] roleIds = {roleId};
-
+				else {
+					 roleIds = new long[]{roleId};
+				}
 				String screenName = csvRecord.get("username");
 				String emailAddress = csvRecord.get("email");
 				String firstName = csvRecord.get("firstname");
