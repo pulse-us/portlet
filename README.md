@@ -1,13 +1,12 @@
 # Portlet for PULSE-US
 
-Designed to provide JWT from Liferay CE for use as authentication/authorization token
+Designed to provide JWT from Liferay CE for use as authentication/authorization token. Also provides capability to upload users in a CSV file.
 
 ## Deploy Instructions
 
 1. Copy the portlet.properties.template file to portlet.properties file
 1. Copy the keylocation property from the service app
-1. Set jwtIssuer and jwtAudience to PULSE-US in both service application.properties and portlet.properties here
-to `PULSE-US`
+1. Set jwtIssuer and jwtAudience to PULSE-US in both service application.properties and portlet.properties here to `PULSE-US`
 1. `./gradlew assemble` in root directory
 1. `cp build/libs/PULSEAuthPortlet.war <liferay-installation>/deploy/`
 1. Sign into Liferay
@@ -23,6 +22,10 @@ Once the portlet has been deployed, when it needs to be re-deployed set an envir
 > export PULSE_LIFERAY=/the/directory/where/liferay/lives
 > ./deploy-portlet.sh
 ```
+
+## User upload
+
+The portlet has a REST based endpoint initiates a CSV upload of users. The system will look for a file of users at the location specified in the `csvFile` value from the portlet.properties file. Clicking on the url `https://LOCATION OF PULSE DMZ/o/PULSEAuthPortlet/rest/addusers` will initiate the user upload. The structure of the upload CSV is defined in the [CSV upload data description file](./CSV_upload_data_description.xlsx).
 
 ## Checkstyle
 
