@@ -22,14 +22,18 @@ import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.WebKeys;
 
 @RestController
 public class CSVController {
@@ -83,7 +87,10 @@ public class CSVController {
 		Organization stateOrg;
 		Organization acfOrg;
 		
-
+		Role orgAdminRole = RoleLocalServiceUtil.getRole(companyId, RoleConstants.ORGANIZATION_ADMINISTRATOR);
+		Long orgAdminRoleId = 	orgAdminRole.getRoleId();
+		
+		
 		for (CSVRecord csvRecord : csvRecords) {
 			long[] organizationIds = null;
 			long[] roleIds = null;
@@ -92,9 +99,6 @@ public class CSVController {
 			try {			
 				Role role = RoleLocalServiceUtil.getRole(companyId, csvRecord.get("role"));
 				Long roleId = 	role.getRoleId();
-				
-				Role orgAdminRole = RoleLocalServiceUtil.getRole(companyId, "Organization Administrator");
-				Long orgAdminRoleId = 	orgAdminRole.getRoleId();
 
 
 				if(csvRecord.get("role").equals("ROLE_ADMIN")) {
@@ -143,14 +147,8 @@ public class CSVController {
 				else if(orgId1 != null && organizationIds == null){
 					organizationIds=new long[]{orgId1};
 				}
-
-				if(csvRecord.get("role").equals("ROLE_ORG_ADMIN")) {
-					 roleIds = new long[]{roleId,orgAdminRoleId};
-				}
-
-				else {
-					 roleIds = new long[]{roleId};
-				}
+				 roleIds = new long[]{roleId};
+				 
 				String screenName = csvRecord.get("username");
 				String emailAddress = csvRecord.get("email");
 				String firstName = csvRecord.get("firstname");
@@ -170,7 +168,11 @@ public class CSVController {
 
 				user = UserLocalServiceUtil.updateEmailAddressVerified(user.getUserId(), true);
 				user = UserLocalServiceUtil.updatePasswordReset(user.getUserId(), false);
-
+				if(csvRecord.get("role").equals("ROLE_ORG_ADMIN")){
+					long[] adminIds = {orgAdminRoleId};
+					Organization adminOrg = OrganizationLocalServiceUtil.getOrganization(companyId, csvRecord.get("stateOrg"));
+					UserGroupRoleLocalServiceUtil.addUserGroupRoles(user.getUserId(), adminOrg.getGroupId(), adminIds);
+				}
 				log.info("user added "+csvRecord.get("username"));
 
 			}
@@ -182,6 +184,5 @@ public class CSVController {
 			}
 
 		}
-
 	}
 }
