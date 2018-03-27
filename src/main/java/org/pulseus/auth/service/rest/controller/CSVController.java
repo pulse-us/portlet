@@ -86,11 +86,15 @@ public class CSVController {
 
 		for (CSVRecord csvRecord : csvRecords) {
 			long[] organizationIds = null;
+			long[] roleIds = null;
 			Long orgId1 = null;
 			Long orgId2 = null;
 			try {			
 				Role role = RoleLocalServiceUtil.getRole(companyId, csvRecord.get("role"));
 				Long roleId = 	role.getRoleId();
+				
+				Role orgAdminRole = RoleLocalServiceUtil.getRole(companyId, "Organization Administrator");
+				Long orgAdminRoleId = 	orgAdminRole.getRoleId();
 
 
 				if(csvRecord.get("role").equals("ROLE_ADMIN")) {
@@ -140,9 +144,13 @@ public class CSVController {
 					organizationIds=new long[]{orgId1};
 				}
 
+				if(csvRecord.get("role").equals("ROLE_ORG_ADMIN")) {
+					 roleIds = new long[]{roleId,orgAdminRoleId};
+				}
 
-				long[] roleIds = {roleId};
-
+				else {
+					 roleIds = new long[]{roleId};
+				}
 				String screenName = csvRecord.get("username");
 				String emailAddress = csvRecord.get("email");
 				String firstName = csvRecord.get("firstname");
